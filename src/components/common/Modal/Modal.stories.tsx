@@ -1,6 +1,28 @@
-import React from 'react';
+import React, { useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { Modal } from './Modal';
+
+const ModalDemoComponent = () => {
+  const [text, setText] = useState('');
+  const [visible, setVisible] = useState(false);
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, maxWidth: 320 }}>
+      <input
+        value={text}
+        onChange={(e) => setText(e.target.value)}
+        placeholder="Введите текст для модального окна..."
+        style={{ padding: '8px 12px', fontSize: 14, borderRadius: 6, border: '1px solid #ccc' }}
+      />
+      <button type="button" onClick={() => setVisible(true)} style={{ padding: '8px 16px' }}>
+        Открыть модальное окно
+      </button>
+      <Modal visible={visible} onClose={() => setVisible(false)}>
+        <h3 style={{ margin: '0 0 12px' }}>Содержимое окна</h3>
+        <p style={{ margin: 0 }}>{text || '(текст не введён)'}</p>
+      </Modal>
+    </div>
+  );
+};
 
 const meta: Meta<typeof Modal> = {
   title: 'Common/Modal',
@@ -35,4 +57,8 @@ export const Hidden: Story = {
       <p>Этот контент не виден</p>
     </Modal>
   ),
+};
+
+export const WithInput: Story = {
+  render: () => <ModalDemoComponent />,
 };

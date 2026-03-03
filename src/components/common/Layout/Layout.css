@@ -2,6 +2,9 @@
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  background-color: var(--color-bg, #f5f7fa);
+  color: var(--color-text, #1a1a2e);
+  transition: background-color 0.3s, color 0.3s;
 }
 
 .layout__content {
