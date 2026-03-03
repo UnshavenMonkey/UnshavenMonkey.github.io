@@ -1,0 +1,78 @@
+.operation-full {
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.operation-full__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px;
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.operation-full__amount {
+  font-size: 28px;
+  font-weight: 700;
+}
+
+.operation-full__amount--income {
+  color: #22c55e;
+}
+
+.operation-full__amount--expense {
+  color: #ef4444;
+}
+
+.operation-full__edit {
+  padding: 8px 16px;
+  background-color: #6c63ff;
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.operation-full__edit:hover {
+  background-color: #5a52d5;
+}
+
+.operation-full__body {
+  padding: 20px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.operation-full__category {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #6c63ff;
+}
+
+.operation-full__title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #1a1a2e;
+  margin: 0;
+}
+
+.operation-full__description {
+  font-size: 14px;
+  color: #666;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.operation-full__date {
+  font-size: 13px;
+  color: #999;
+  margin-top: 4px;
+}

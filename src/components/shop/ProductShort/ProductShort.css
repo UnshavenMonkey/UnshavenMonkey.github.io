@@ -1,0 +1,46 @@
+.product-short {
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  width: 240px;
+}
+
+.product-short__image {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  background-color: #f0f0f0;
+}
+
+.product-short__info {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+}
+
+.product-short__price {
+  font-size: 18px;
+  font-weight: 700;
+  color: #6c63ff;
+}
+
+.product-short__title {
+  font-size: 15px;
+  font-weight: 600;
+  color: #1a1a2e;
+  margin: 0;
+}
+
+.product-short__description {
+  font-size: 13px;
+  color: #666;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
