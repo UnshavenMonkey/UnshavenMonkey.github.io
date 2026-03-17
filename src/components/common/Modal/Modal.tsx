@@ -1,4 +1,5 @@
 import React, { FC, ReactNode } from 'react';
+import ReactDOM from 'react-dom';
 import './Modal.css';
 
 interface ModalProps {
@@ -10,7 +11,7 @@ interface ModalProps {
 export const Modal: FC<ModalProps> = ({ visible, children, onClose }) => {
   if (!visible) return null;
 
-  return (
+  return ReactDOM.createPortal(
     <div className="modal">
       <div className="modal__window">
         <button className="modal__close" type="button" onClick={onClose}>
@@ -18,6 +19,7 @@ export const Modal: FC<ModalProps> = ({ visible, children, onClose }) => {
         </button>
         <div className="modal__body">{children}</div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };

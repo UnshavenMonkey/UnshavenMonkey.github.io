@@ -9,6 +9,7 @@ import { CartButton } from '../components/shop/CartButton/CartButton';
 import { ProductShort } from '../components/shop/ProductShort/ProductShort';
 import { ProductFull } from '../components/shop/ProductFull/ProductFull';
 import { CartItem } from '../components/shop/CartItem/CartItem';
+import { ProductList } from '../components/shop/ProductList/ProductList';
 import './App.css';
 
 function App() {
@@ -103,6 +104,11 @@ function App() {
               <CartItem price={1990} image="https://placehold.co/64x64" title="Беспроводные наушники Pro" count={2} />
               <CartItem price={4990} image="https://placehold.co/64x64" title="Механическая клавиатура" count={1} />
             </div>
+          </section>
+
+          <section style={{ marginBottom: 40 }}>
+            <h2>Магазин — список товаров</h2>
+            <ProductList />
           </section>
         </Layout>
       </ThemeProvider>
