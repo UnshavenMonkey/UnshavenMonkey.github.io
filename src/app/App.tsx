@@ -7,6 +7,9 @@ import { CartButton } from '../components/shop/CartButton/CartButton';
 import { ProductShort } from '../components/shop/ProductShort/ProductShort';
 import { ProductFull } from '../components/shop/ProductFull/ProductFull';
 import { CartItem } from '../components/shop/CartItem/CartItem';
+import { ProfileForm } from '../components/forms/ProfileForm';
+import { ProductForm } from '../components/forms/ProductForm';
+import { AuthForm } from '../components/forms/AuthForm';
 import './App.css';
 
 function App() {
@@ -14,6 +17,36 @@ function App() {
 
   return (
     <Layout>
+      <section style={{ marginBottom: 40 }}>
+        <h2>Forms</h2>
+        <div style={{ display: 'flex', gap: 24, flexWrap: 'wrap', alignItems: 'flex-start' }}>
+          <ProfileForm
+            initialValues={{
+              name: 'Jane Cooper',
+              about: 'Frontend developer and regular customer.',
+            }}
+          />
+          <ProductForm
+            initialValues={{
+              title: 'Wireless headphones',
+              category: 'Electronics',
+              price: '1990',
+              image: 'https://placehold.co/360x360',
+              description: 'Headphones with active noise cancellation and fast charging.',
+            }}
+          />
+          <AuthForm
+            initialMode="register"
+            initialValues={{
+              email: 'jane@example.com',
+              password: 'Password123',
+              name: 'Jane Cooper',
+              confirmPassword: 'Password123',
+            }}
+          />
+        </div>
+      </section>
+
       <section style={{ marginBottom: 40 }}>
         <h2>Modal</h2>
         <button type="button" onClick={() => setModalVisible(true)}>
