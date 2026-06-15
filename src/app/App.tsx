@@ -1,106 +1,59 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
+import { HashRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { Layout } from '../components/common/Layout/Layout';
-import { Modal } from '../components/common/Modal/Modal';
-import { OperationShort } from '../components/expenses/OperationShort/OperationShort';
-import { OperationFull } from '../components/expenses/OperationFull/OperationFull';
-import { CartButton } from '../components/shop/CartButton/CartButton';
-import { ProductShort } from '../components/shop/ProductShort/ProductShort';
-import { ProductFull } from '../components/shop/ProductFull/ProductFull';
-import { CartItem } from '../components/shop/CartItem/CartItem';
+import { CartPage } from '../pages/cart/CartPage';
+import { ProductModalPage } from '../pages/products/ProductModalPage';
+import { ProductsPage } from '../pages/products/ProductsPage';
+import { ProfilePage, ProfileFormValues } from '../pages/profile/ProfilePage';
+import { CartProduct, Product, products as initialProducts } from '../shared/data/products';
 import './App.css';
 
 function App() {
-  const [modalVisible, setModalVisible] = useState(false);
+  const [products, setProducts] = useState<Product[]>(initialProducts);
+  const [profile, setProfile] = useState<ProfileFormValues>({
+    name: 'Алексей Иванов',
+    email: 'alexey@example.com',
+    phone: '+7 999 123-45-67',
+    address: 'Москва, ул. Лесная, 12',
+  });
+
+  const cartProducts = useMemo<CartProduct[]>(
+    () => products.slice(0, 2).map((product, index) => ({ ...product, count: index === 0 ? 2 : 1 })),
+    [products]
+  );
+
+  const upsertProduct = (product: Product) => {
+    setProducts((currentProducts) => {
+      const productExists = currentProducts.some((currentProduct) => currentProduct.id === product.id);
+
+      if (!productExists) {
+        return [product, ...currentProducts];
+      }
+
+      return currentProducts.map((currentProduct) => (currentProduct.id === product.id ? product : currentProduct));
+    });
+  };
 
   return (
-    <Layout>
-      <section style={{ marginBottom: 40 }}>
-        <h2>Modal</h2>
-        <button type="button" onClick={() => setModalVisible(true)}>
-          Открыть модальное окно
-        </button>
-        <Modal visible={modalVisible} onClose={() => setModalVisible(false)}>
-          <h3 style={{ margin: '0 0 8px' }}>Пример модального окна</h3>
-          <p style={{ margin: 0 }}>Содержимое окна</p>
-        </Modal>
-      </section>
-
-      <section style={{ marginBottom: 40 }}>
-        <h2>Учёт расходов</h2>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 8, maxWidth: 500 }}>
-          <OperationShort
-            amount={-2500}
-            category="Продукты"
-            title="Покупка в супермаркете"
-            description="Молоко, хлеб, яйца, масло, сыр и другие продукты питания"
+    <HashRouter>
+      <Layout>
+        <Routes>
+          <Route path="/" element={<Navigate to="/products" replace />} />
+          <Route path="/profile" element={<ProfilePage values={profile} onSubmit={setProfile} />} />
+          <Route path="/products" element={<ProductsPage products={products} />} />
+          <Route
+            path="/products/new"
+            element={<ProductModalPage products={products} onSave={upsertProduct} mode="create" />}
           />
-          <OperationShort
-            amount={85000}
-            category="Зарплата"
-            title="Зарплата за январь"
-            description="Ежемесячная выплата от работодателя"
+          <Route
+            path="/products/:productId/edit"
+            element={<ProductModalPage products={products} onSave={upsertProduct} mode="edit" />}
           />
-        </div>
-        <div style={{ marginTop: 16, maxWidth: 500 }}>
-          <OperationFull
-            amount={-2500}
-            category="Продукты"
-            title="Покупка в супермаркете"
-            description="Молоко, хлеб, яйца, масло и другие продукты питания на неделю"
-            date="15 января 2025"
-          />
-        </div>
-      </section>
-
-      <section style={{ marginBottom: 40 }}>
-        <h2>Магазин — CartButton</h2>
-        <div style={{ display: 'flex', gap: 16, alignItems: 'center' }}>
-          <div style={{ width: 160 }}>
-            <CartButton count={0} />
-          </div>
-          <div style={{ width: 160 }}>
-            <CartButton count={3} />
-          </div>
-        </div>
-      </section>
-
-      <section style={{ marginBottom: 40 }}>
-        <h2>Магазин — ProductShort</h2>
-        <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
-          <ProductShort
-            price={1990}
-            image="https://placehold.co/240x180"
-            title="Беспроводные наушники"
-            description="Наушники с шумоподавлением и временем работы до 30 часов"
-          />
-          <ProductShort
-            price={4990}
-            image="https://placehold.co/240x180"
-            title="Механическая клавиатура"
-            description="RGB-подсветка, Cherry MX Red переключатели, алюминиевый корпус"
-          />
-        </div>
-      </section>
-
-      <section style={{ marginBottom: 40 }}>
-        <h2>Магазин — ProductFull</h2>
-        <ProductFull
-          price={1990}
-          image="https://placehold.co/360x360"
-          category="Электроника"
-          title="Беспроводные наушники Pro"
-          description="Наушники с активным шумоподавлением нового поколения. Время работы до 30 часов, быстрая зарядка за 15 минут обеспечивает 3 часа воспроизведения."
-        />
-      </section>
-
-      <section style={{ marginBottom: 40 }}>
-        <h2>Магазин — CartItem</h2>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 8, maxWidth: 400 }}>
-          <CartItem price={1990} image="https://placehold.co/64x64" title="Беспроводные наушники Pro" count={2} />
-          <CartItem price={4990} image="https://placehold.co/64x64" title="Механическая клавиатура" count={1} />
-        </div>
-      </section>
-    </Layout>
+          <Route path="/cart" element={<CartPage products={cartProducts} />} />
+          <Route path="*" element={<Navigate to="/products" replace />} />
+        </Routes>
+      </Layout>
+    </HashRouter>
   );
 }
 
