@@ -1,4 +1,8 @@
 import React, { ChangeEvent, Component, FormEvent } from 'react';
+import { authActions } from '../../app/store/authSlice';
+import { useAppDispatch, useAppSelector } from '../../app/store/hooks';
+import { selectProfile } from '../../app/store/selectors';
+import { Profile } from '../../app/store/types';
 import './ProfilePage.css';
 
 export interface ProfileFormValues {
@@ -8,8 +12,8 @@ export interface ProfileFormValues {
   address: string;
 }
 
-interface ProfilePageProps {
-  values: ProfileFormValues;
+interface ProfileFormProps {
+  values: Profile;
   onSubmit: (values: ProfileFormValues) => void;
 }
 
@@ -17,13 +21,13 @@ interface ProfilePageState extends ProfileFormValues {
   saved: boolean;
 }
 
-export class ProfilePage extends Component<ProfilePageProps, ProfilePageState> {
+class ProfileForm extends Component<ProfileFormProps, ProfilePageState> {
   state: ProfilePageState = {
     ...this.props.values,
     saved: false,
   };
 
-  componentDidUpdate(previousProps: ProfilePageProps) {
+  componentDidUpdate(previousProps: ProfileFormProps) {
     if (previousProps.values !== this.props.values) {
       this.setState({ ...this.props.values, saved: false });
     }
@@ -43,12 +47,13 @@ export class ProfilePage extends Component<ProfilePageProps, ProfilePageState> {
 
   render() {
     const { name, email, phone, address, saved } = this.state;
+    const roleTitle = this.props.values.role === 'admin' ? 'Администратор' : 'Покупатель';
 
     return (
       <section className="profile-page">
         <div className="page-heading">
           <h1>Профиль</h1>
-          <p>Контактные данные покупателя для заказов и уведомлений.</p>
+          <p>Контактные данные для заказов и уведомлений. Роль: {roleTitle}.</p>
         </div>
 
         <form className="profile-form" onSubmit={this.handleSubmit}>
@@ -79,3 +84,19 @@ export class ProfilePage extends Component<ProfilePageProps, ProfilePageState> {
     );
   }
 }
+
+export const ProfilePage = () => {
+  const dispatch = useAppDispatch();
+  const profile = useAppSelector(selectProfile);
+
+  if (!profile) {
+    return null;
+  }
+
+  return (
+    <ProfileForm
+      values={profile}
+      onSubmit={(values) => dispatch(authActions.profileUpdated({ ...profile, ...values }))}
+    />
+  );
+};

@@ -10,6 +10,7 @@ const meta: Meta<typeof ProductShort> = {
     image: { control: 'text' },
     title: { control: 'text' },
     description: { control: 'text' },
+    count: { control: { type: 'number', min: 0 } },
   },
 };
 
@@ -18,9 +19,12 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
   args: {
+    id: 'wireless-headphones',
     price: 1990,
     image: 'https://placehold.co/240x180',
     title: 'Беспроводные наушники',
-    description: 'Наушники с шумоподавлением и временем работы до 30 часов, складная конструкция',
+    description: 'Наушники с шумоподавлением и временем работы до 30 часов.',
+    count: 0,
+    onAddToCart: () => undefined,
   },
 };

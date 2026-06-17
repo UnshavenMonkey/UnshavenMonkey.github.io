@@ -23,6 +23,26 @@
   flex-wrap: wrap;
 }
 
+.header__auth {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.header__button {
+  min-height: 36px;
+  padding: 0 12px;
+  white-space: nowrap;
+}
+
+.header__role {
+  color: #4b5563;
+  font-size: 14px;
+  font-weight: 700;
+}
+
 .header__link {
   display: inline-flex;
   align-items: center;
@@ -48,5 +68,9 @@
   .header__inner {
     align-items: flex-start;
     flex-direction: column;
+  }
+
+  .header__auth {
+    justify-content: flex-start;
   }
 }

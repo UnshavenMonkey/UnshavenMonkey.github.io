@@ -16,11 +16,13 @@ type Story = StoryObj<typeof meta>;
 export const Empty: Story = {
   args: {
     count: 0,
+    onAdd: () => undefined,
   },
 };
 
 export const WithItems: Story = {
   args: {
     count: 3,
+    onAdd: () => undefined,
   },
 };

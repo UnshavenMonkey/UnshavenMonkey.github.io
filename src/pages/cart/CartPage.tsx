@@ -1,14 +1,14 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { CartItem } from '../../components/shop/CartItem/CartItem';
-import { CartProduct } from '../../shared/data/products';
+import { cartActions } from '../../app/store/cartSlice';
+import { useAppDispatch, useAppSelector } from '../../app/store/hooks';
+import { selectCartProducts } from '../../app/store/selectors';
 import './CartPage.css';
 
-interface CartPageProps {
-  products: CartProduct[];
-}
-
-export const CartPage = ({ products }: CartPageProps) => {
+export const CartPage = () => {
+  const dispatch = useAppDispatch();
+  const products = useAppSelector(selectCartProducts);
   const total = products.reduce((sum, product) => sum + product.price * product.count, 0);
 
   return (
@@ -20,13 +20,16 @@ export const CartPage = ({ products }: CartPageProps) => {
 
       <div className="cart-page__content">
         <div className="cart-page__list">
+          {products.length === 0 && <p className="cart-page__empty">Корзина пока пуста.</p>}
           {products.map((product) => (
             <CartItem
               key={product.id}
+              id={product.id}
               price={product.price}
               image={product.image}
               title={product.title}
               count={product.count}
+              onRemove={(productId) => dispatch(cartActions.removeFromCart(productId))}
             />
           ))}
         </div>

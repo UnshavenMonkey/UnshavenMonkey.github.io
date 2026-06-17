@@ -1,18 +1,21 @@
 import React, { ChangeEvent, Component, FormEvent } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { productsActions } from '../../app/store/productsSlice';
+import { useAppDispatch, useAppSelector } from '../../app/store/hooks';
+import { selectProducts } from '../../app/store/selectors';
 import { Modal } from '../../components/common/Modal/Modal';
 import { Product } from '../../shared/data/products';
 import { ProductsPage } from './ProductsPage';
 import './ProductModalPage.css';
 
 interface ProductModalRouteProps {
-  products: Product[];
   mode: 'create' | 'edit';
-  onSave: (product: Product) => void;
 }
 
 interface ProductModalProps extends ProductModalRouteProps {
+  products: Product[];
   navigate: (to: string) => void;
+  onSave: (product: Product) => void;
   productId?: string;
 }
 
@@ -74,9 +77,10 @@ class ProductModal extends Component<ProductModalProps, ProductModalState> {
   handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const { id, title, category, price, image, description } = this.state;
+    const normalizedId = id || title.trim().toLowerCase().replace(/\s+/g, '-');
 
     this.props.onSave({
-      id: id || title.trim().toLowerCase().replace(/\s+/g, '-'),
+      id: normalizedId,
       title,
       category,
       price: Number(price),
@@ -96,7 +100,7 @@ class ProductModal extends Component<ProductModalProps, ProductModalState> {
 
     return (
       <>
-        <ProductsPage products={this.props.products} />
+        <ProductsPage />
         <Modal visible onClose={this.closeModal}>
           <form className="product-modal-form" onSubmit={this.handleSubmit}>
             <h2>{titleText}</h2>
@@ -140,8 +144,18 @@ class ProductModal extends Component<ProductModalProps, ProductModalState> {
 }
 
 export const ProductModalPage = (props: ProductModalRouteProps) => {
+  const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const { productId } = useParams();
+  const products = useAppSelector(selectProducts);
 
-  return <ProductModal {...props} navigate={navigate} productId={productId} />;
+  return (
+    <ProductModal
+      {...props}
+      products={products}
+      navigate={navigate}
+      onSave={(product) => dispatch(productsActions.upsertProduct(product))}
+      productId={productId}
+    />
+  );
 };

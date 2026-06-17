@@ -1,55 +1,85 @@
-import React, { useMemo, useState } from 'react';
+import React, { FC, ReactNode, useEffect } from 'react';
 import { HashRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { Layout } from '../components/common/Layout/Layout';
 import { CartPage } from '../pages/cart/CartPage';
 import { ProductModalPage } from '../pages/products/ProductModalPage';
 import { ProductsPage } from '../pages/products/ProductsPage';
-import { ProfilePage, ProfileFormValues } from '../pages/profile/ProfilePage';
-import { CartProduct, Product, products as initialProducts } from '../shared/data/products';
+import { ProfilePage } from '../pages/profile/ProfilePage';
+import { authActions } from './store/authSlice';
+import { TOKEN_STORAGE_KEY } from './store/authSaga';
+import { useAppDispatch, useAppSelector } from './store/hooks';
+import { selectIsAdmin, selectIsAuthorized, selectIsInitialized } from './store/selectors';
 import './App.css';
 
+interface ProtectedRouteProps {
+  allowed: boolean;
+  children: ReactNode;
+}
+
+const ProtectedRoute: FC<ProtectedRouteProps> = ({ allowed, children }) => {
+  if (!allowed) {
+    return <Navigate to="/products" replace />;
+  }
+
+  return <>{children}</>;
+};
+
 function App() {
-  const [products, setProducts] = useState<Product[]>(initialProducts);
-  const [profile, setProfile] = useState<ProfileFormValues>({
-    name: 'Алексей Иванов',
-    email: 'alexey@example.com',
-    phone: '+7 999 123-45-67',
-    address: 'Москва, ул. Лесная, 12',
-  });
+  const dispatch = useAppDispatch();
+  const initialized = useAppSelector(selectIsInitialized);
+  const isAuthorized = useAppSelector(selectIsAuthorized);
+  const isAdmin = useAppSelector(selectIsAdmin);
 
-  const cartProducts = useMemo<CartProduct[]>(
-    () => products.slice(0, 2).map((product, index) => ({ ...product, count: index === 0 ? 2 : 1 })),
-    [products]
-  );
+  useEffect(() => {
+    dispatch(authActions.appStarted());
+  }, [dispatch]);
 
-  const upsertProduct = (product: Product) => {
-    setProducts((currentProducts) => {
-      const productExists = currentProducts.some((currentProduct) => currentProduct.id === product.id);
-
-      if (!productExists) {
-        return [product, ...currentProducts];
+  useEffect(() => {
+    const handleStorage = (event: StorageEvent) => {
+      if (event.key === TOKEN_STORAGE_KEY) {
+        dispatch(authActions.tokenChangedFromStorage(event.newValue));
       }
+    };
 
-      return currentProducts.map((currentProduct) => (currentProduct.id === product.id ? product : currentProduct));
-    });
-  };
+    window.addEventListener('storage', handleStorage);
+    return () => window.removeEventListener('storage', handleStorage);
+  }, [dispatch]);
+
+  if (!initialized) {
+    return <div className="app-loading">Loading...</div>;
+  }
 
   return (
     <HashRouter>
       <Layout>
         <Routes>
           <Route path="/" element={<Navigate to="/products" replace />} />
-          <Route path="/profile" element={<ProfilePage values={profile} onSubmit={setProfile} />} />
-          <Route path="/products" element={<ProductsPage products={products} />} />
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRoute allowed={isAuthorized}>
+                <ProfilePage />
+              </ProtectedRoute>
+            }
+          />
+          <Route path="/products" element={<ProductsPage />} />
           <Route
             path="/products/new"
-            element={<ProductModalPage products={products} onSave={upsertProduct} mode="create" />}
+            element={
+              <ProtectedRoute allowed={isAdmin}>
+                <ProductModalPage mode="create" />
+              </ProtectedRoute>
+            }
           />
           <Route
             path="/products/:productId/edit"
-            element={<ProductModalPage products={products} onSave={upsertProduct} mode="edit" />}
+            element={
+              <ProtectedRoute allowed={isAdmin}>
+                <ProductModalPage mode="edit" />
+              </ProtectedRoute>
+            }
           />
-          <Route path="/cart" element={<CartPage products={cartProducts} />} />
+          <Route path="/cart" element={<CartPage />} />
           <Route path="*" element={<Navigate to="/products" replace />} />
         </Routes>
       </Layout>
