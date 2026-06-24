@@ -4,6 +4,7 @@ import { authSlice } from './authSlice';
 import { cartSlice } from './cartSlice';
 import { productsSlice } from './productsSlice';
 import { rootSaga } from './rootSaga';
+import { signupApi } from './signupApi';
 
 const sagaMiddleware = createSagaMiddleware();
 
@@ -12,8 +13,9 @@ export const store = configureStore({
     auth: authSlice.reducer,
     cart: cartSlice.reducer,
     products: productsSlice.reducer,
+    [signupApi.reducerPath]: signupApi.reducer,
   },
-  middleware: (getDefaultMiddleware) => getDefaultMiddleware({ thunk: false }).concat(sagaMiddleware),
+  middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(signupApi.middleware, sagaMiddleware),
 });
 
 sagaMiddleware.run(rootSaga);

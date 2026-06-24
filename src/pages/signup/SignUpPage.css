@@ -1,0 +1,67 @@
+.signup-page {
+  display: grid;
+  gap: 24px;
+}
+
+.signup-page__forms {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+  align-items: start;
+}
+
+.signup-form {
+  display: grid;
+  gap: 16px;
+  padding: 20px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background-color: #ffffff;
+}
+
+.signup-form h2 {
+  margin: 0;
+  color: #111827;
+  font-size: 20px;
+}
+
+.signup-form__field {
+  display: grid;
+  gap: 6px;
+  color: #374151;
+  font-weight: 700;
+}
+
+.signup-form__field input {
+  min-height: 40px;
+  box-sizing: border-box;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  padding: 8px 10px;
+  color: #111827;
+  font: inherit;
+}
+
+.signup-form__field input:focus {
+  border-color: #2563eb;
+  outline: 2px solid #bfdbfe;
+}
+
+.signup-form__field input[aria-invalid='true'] {
+  border-color: #dc2626;
+}
+
+.signup-form__error {
+  margin: 0;
+  color: #dc2626;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.signup-form__success {
+  margin: 0;
+  overflow-wrap: anywhere;
+  color: #047857;
+  font-size: 14px;
+  font-weight: 600;
+}

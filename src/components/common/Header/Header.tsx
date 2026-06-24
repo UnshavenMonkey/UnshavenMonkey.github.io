@@ -21,6 +21,9 @@ export const Header: FC = () => {
           <NavLink className="header__link" to="/cart">
             Корзина
           </NavLink>
+          <NavLink className="header__link" to="/signup">
+            Регистрация
+          </NavLink>
           {profile && (
             <NavLink className="header__link" to="/profile">
               Профиль
