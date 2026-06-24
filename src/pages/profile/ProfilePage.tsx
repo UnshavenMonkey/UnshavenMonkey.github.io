@@ -1,19 +1,18 @@
 import React, { ChangeEvent, Component, FormEvent } from 'react';
 import { authActions } from '../../app/store/authSlice';
 import { useAppDispatch, useAppSelector } from '../../app/store/hooks';
-import { selectProfile } from '../../app/store/selectors';
+import { selectProfile, selectProfileError, selectProfileSaving } from '../../app/store/selectors';
 import { Profile } from '../../app/store/types';
 import './ProfilePage.css';
 
 export interface ProfileFormValues {
   name: string;
-  email: string;
-  phone: string;
-  address: string;
 }
 
 interface ProfileFormProps {
   values: Profile;
+  saving: boolean;
+  error: string | null;
   onSubmit: (values: ProfileFormValues) => void;
 }
 
@@ -23,61 +22,54 @@ interface ProfilePageState extends ProfileFormValues {
 
 class ProfileForm extends Component<ProfileFormProps, ProfilePageState> {
   state: ProfilePageState = {
-    ...this.props.values,
+    name: this.props.values.name,
     saved: false,
   };
 
   componentDidUpdate(previousProps: ProfileFormProps) {
     if (previousProps.values !== this.props.values) {
-      this.setState({ ...this.props.values, saved: false });
+      this.setState({ name: this.props.values.name, saved: true });
     }
   }
 
-  handleChange = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = event.target;
-    this.setState({ [name]: value, saved: false } as Pick<ProfilePageState, keyof ProfilePageState>);
+  handleChange = (event: ChangeEvent<HTMLInputElement>) => {
+    this.setState({ name: event.target.value, saved: false });
   };
 
   handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const { name, email, phone, address } = this.state;
-    this.props.onSubmit({ name, email, phone, address });
-    this.setState({ saved: true });
+    this.props.onSubmit({ name: this.state.name });
   };
 
   render() {
-    const { name, email, phone, address, saved } = this.state;
-    const roleTitle = this.props.values.role === 'admin' ? 'Администратор' : 'Покупатель';
+    const { name, saved } = this.state;
+    const { values, saving, error } = this.props;
 
     return (
       <section className="profile-page">
         <div className="page-heading">
           <h1>Профиль</h1>
-          <p>Контактные данные для заказов и уведомлений. Роль: {roleTitle}.</p>
+          <p>Данные загружаются с REST API. Сервер разрешает редактировать имя пользователя.</p>
         </div>
 
         <form className="profile-form" onSubmit={this.handleSubmit}>
           <label className="field">
             <span>Имя</span>
-            <input name="name" value={name} onChange={this.handleChange} required />
+            <input name="name" value={name} onChange={this.handleChange} />
           </label>
           <label className="field">
             <span>Email</span>
-            <input name="email" type="email" value={email} onChange={this.handleChange} required />
+            <input name="email" type="email" value={values.email} disabled />
           </label>
-          <label className="field">
-            <span>Телефон</span>
-            <input name="phone" value={phone} onChange={this.handleChange} required />
-          </label>
-          <label className="field">
-            <span>Адрес доставки</span>
-            <textarea name="address" rows={4} value={address} onChange={this.handleChange} required />
-          </label>
+          {values.signUpDate && (
+            <p className="profile-form__meta">Дата регистрации: {new Date(values.signUpDate).toLocaleDateString()}</p>
+          )}
+          {error && <p className="profile-form__error">{error}</p>}
           <div className="profile-form__footer">
-            <button className="primary-button" type="submit">
-              Сохранить профиль
+            <button className="primary-button" disabled={saving} type="submit">
+              {saving ? 'Сохраняем...' : 'Сохранить профиль'}
             </button>
-            {saved && <span className="profile-form__status">Профиль сохранен</span>}
+            {saved && !error && <span className="profile-form__status">Профиль сохранен</span>}
           </div>
         </form>
       </section>
@@ -88,6 +80,8 @@ class ProfileForm extends Component<ProfileFormProps, ProfilePageState> {
 export const ProfilePage = () => {
   const dispatch = useAppDispatch();
   const profile = useAppSelector(selectProfile);
+  const saving = useAppSelector(selectProfileSaving);
+  const error = useAppSelector(selectProfileError);
 
   if (!profile) {
     return null;
@@ -96,7 +90,9 @@ export const ProfilePage = () => {
   return (
     <ProfileForm
       values={profile}
-      onSubmit={(values) => dispatch(authActions.profileUpdated({ ...profile, ...values }))}
+      saving={saving}
+      error={error}
+      onSubmit={(values) => dispatch(authActions.profileUpdateRequested(values))}
     />
   );
 };

@@ -1,10 +1,14 @@
 import React, { ChangeEvent, Component, FormEvent } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { productsActions } from '../../app/store/productsSlice';
+import { productsActions, ProductFormValues } from '../../app/store/productsSlice';
 import { useAppDispatch, useAppSelector } from '../../app/store/hooks';
-import { selectProducts } from '../../app/store/selectors';
+import {
+  selectProductCategories,
+  selectProductSaveError,
+  selectProductSaving,
+  selectProducts,
+} from '../../app/store/selectors';
 import { Modal } from '../../components/common/Modal/Modal';
-import { Product } from '../../shared/data/products';
 import { ProductsPage } from './ProductsPage';
 import './ProductModalPage.css';
 
@@ -13,40 +17,41 @@ interface ProductModalRouteProps {
 }
 
 interface ProductModalProps extends ProductModalRouteProps {
-  products: Product[];
+  products: ReturnType<typeof selectProducts>;
+  categories: ReturnType<typeof selectProductCategories>;
+  saving: boolean;
+  saveError: string | null;
   navigate: (to: string) => void;
-  onSave: (product: Product) => void;
+  onSave: (mode: 'create' | 'edit', values: ProductFormValues) => void;
   productId?: string;
 }
 
-interface ProductModalState {
-  id: string;
-  title: string;
-  category: string;
-  price: string;
-  image: string;
-  description: string;
-}
-
-class ProductModal extends Component<ProductModalProps, ProductModalState> {
-  state: ProductModalState = this.getInitialState();
+class ProductModal extends Component<ProductModalProps, ProductFormValues> {
+  state: ProductFormValues = this.getInitialState();
 
   componentDidMount() {
     document.addEventListener('keydown', this.handleKeyDown);
+  }
+
+  componentDidUpdate(previousProps: ProductModalProps) {
+    if (previousProps.saving && !this.props.saving && !this.props.saveError) {
+      this.closeModal();
+    }
   }
 
   componentWillUnmount() {
     document.removeEventListener('keydown', this.handleKeyDown);
   }
 
-  getInitialState(): ProductModalState {
+  getInitialState(): ProductFormValues {
     const product = this.props.products.find((item) => item.id === this.props.productId);
 
     if (product) {
       return {
         id: product.id,
         title: product.title,
-        category: product.category,
+        categoryId: product.categoryId || '',
+        categoryName: product.category,
         price: String(product.price),
         image: product.image,
         description: product.description,
@@ -54,9 +59,9 @@ class ProductModal extends Component<ProductModalProps, ProductModalState> {
     }
 
     return {
-      id: '',
       title: '',
-      category: '',
+      categoryId: this.props.categories[0]?.id || '',
+      categoryName: '',
       price: '',
       image: 'https://placehold.co/240x180/e5e7eb/1f2937?text=New',
       description: '',
@@ -69,25 +74,14 @@ class ProductModal extends Component<ProductModalProps, ProductModalState> {
     }
   };
 
-  handleChange = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  handleChange = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = event.target;
-    this.setState({ [name]: value } as Pick<ProductModalState, keyof ProductModalState>);
+    this.setState({ [name]: value } as Pick<ProductFormValues, keyof ProductFormValues>);
   };
 
   handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const { id, title, category, price, image, description } = this.state;
-    const normalizedId = id || title.trim().toLowerCase().replace(/\s+/g, '-');
-
-    this.props.onSave({
-      id: normalizedId,
-      title,
-      category,
-      price: Number(price),
-      image,
-      description,
-    });
-    this.closeModal();
+    this.props.onSave(this.props.mode, this.state);
   };
 
   closeModal = () => {
@@ -95,7 +89,7 @@ class ProductModal extends Component<ProductModalProps, ProductModalState> {
   };
 
   render() {
-    const { id, title, category, price, image, description } = this.state;
+    const { title, categoryId, price, image, description } = this.state;
     const titleText = this.props.mode === 'create' ? 'Новый товар' : 'Редактирование товара';
 
     return (
@@ -105,32 +99,45 @@ class ProductModal extends Component<ProductModalProps, ProductModalState> {
           <form className="product-modal-form" onSubmit={this.handleSubmit}>
             <h2>{titleText}</h2>
             <label className="field">
-              <span>Идентификатор</span>
-              <input name="id" value={id} onChange={this.handleChange} placeholder="smart-watch" />
-            </label>
-            <label className="field">
               <span>Название</span>
-              <input name="title" value={title} onChange={this.handleChange} required />
+              <input name="title" value={title} onChange={this.handleChange} />
             </label>
             <label className="field">
               <span>Категория</span>
-              <input name="category" value={category} onChange={this.handleChange} required />
+              <select name="categoryId" value={categoryId} onChange={this.handleChange}>
+                <option value="">Выберите категорию</option>
+                {this.props.categories.map((category) => (
+                  <option key={category.id} value={category.id}>
+                    {category.name}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className="field">
+              <span>Новая категория</span>
+              <input
+                name="categoryName"
+                value={this.state.categoryName}
+                onChange={this.handleChange}
+                placeholder="Заполните, если категории нет в списке"
+              />
             </label>
             <label className="field">
               <span>Цена</span>
-              <input name="price" type="number" min="1" value={price} onChange={this.handleChange} required />
+              <input name="price" type="number" min="1" value={price} onChange={this.handleChange} />
             </label>
             <label className="field">
               <span>Изображение</span>
-              <input name="image" value={image} onChange={this.handleChange} required />
+              <input name="image" value={image} onChange={this.handleChange} />
             </label>
             <label className="field">
               <span>Описание</span>
-              <textarea name="description" rows={3} value={description} onChange={this.handleChange} required />
+              <textarea name="description" rows={3} value={description} onChange={this.handleChange} />
             </label>
+            {this.props.saveError && <p className="product-modal-form__error">{this.props.saveError}</p>}
             <div className="product-modal-form__actions">
-              <button className="primary-button" type="submit">
-                Сохранить
+              <button className="primary-button" disabled={this.props.saving} type="submit">
+                {this.props.saving ? 'Сохраняем...' : 'Сохранить'}
               </button>
               <button className="secondary-button" type="button" onClick={this.closeModal}>
                 Отмена
@@ -148,13 +155,19 @@ export const ProductModalPage = (props: ProductModalRouteProps) => {
   const navigate = useNavigate();
   const { productId } = useParams();
   const products = useAppSelector(selectProducts);
+  const categories = useAppSelector(selectProductCategories);
+  const saving = useAppSelector(selectProductSaving);
+  const saveError = useAppSelector(selectProductSaveError);
 
   return (
     <ProductModal
       {...props}
       products={products}
+      categories={categories}
+      saving={saving}
+      saveError={saveError}
       navigate={navigate}
-      onSave={(product) => dispatch(productsActions.upsertProduct(product))}
+      onSave={(mode, values) => dispatch(productsActions.productSaveRequested({ mode, values }))}
       productId={productId}
     />
   );

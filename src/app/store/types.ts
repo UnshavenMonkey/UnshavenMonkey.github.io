@@ -1,10 +1,11 @@
 export type UserRole = 'user' | 'admin';
 
 export interface Profile {
+  id?: string;
   name: string;
   email: string;
-  phone: string;
-  address: string;
+  signUpDate?: string;
+  commandId?: string;
   role: UserRole;
 }
 

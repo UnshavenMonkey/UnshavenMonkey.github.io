@@ -38,6 +38,20 @@
   font-size: 28px;
 }
 
+.cart-summary__error,
+.cart-summary__success {
+  margin: 0;
+  font-weight: 600;
+}
+
+.cart-summary__error {
+  color: #dc2626;
+}
+
+.cart-summary__success {
+  color: #047857;
+}
+
 @media (max-width: 760px) {
   .cart-page__content {
     grid-template-columns: 1fr;

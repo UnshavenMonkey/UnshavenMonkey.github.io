@@ -39,7 +39,8 @@
 }
 
 .field input,
-.field textarea {
+.field textarea,
+.field select {
   width: 100%;
   box-sizing: border-box;
   border: 1px solid #d1d5db;
@@ -62,5 +63,16 @@
 
 .profile-form__status {
   color: #047857;
+  font-weight: 600;
+}
+
+.profile-form__meta {
+  margin: 0;
+  color: #6b7280;
+}
+
+.profile-form__error {
+  margin: 0;
+  color: #dc2626;
   font-weight: 600;
 }

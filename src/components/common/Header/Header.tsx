@@ -33,7 +33,7 @@ export const Header: FC = () => {
         <div className="header__auth">
           {profile ? (
             <>
-              <span className="header__role">{profile.role === 'admin' ? 'Админ' : 'Пользователь'}</span>
+              <span className="header__role">{profile.email}</span>
               <button
                 className="secondary-button header__button"
                 type="button"
@@ -43,22 +43,9 @@ export const Header: FC = () => {
               </button>
             </>
           ) : (
-            <>
-              <button
-                className="secondary-button header__button"
-                type="button"
-                onClick={() => dispatch(authActions.loginRequested('user'))}
-              >
-                Войти
-              </button>
-              <button
-                className="primary-button header__button"
-                type="button"
-                onClick={() => dispatch(authActions.loginRequested('admin'))}
-              >
-                Войти как админ
-              </button>
-            </>
+            <NavLink className="primary-button header__button" to="/signin">
+              Войти
+            </NavLink>
           )}
         </div>
       </div>

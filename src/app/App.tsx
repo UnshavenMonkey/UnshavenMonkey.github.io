@@ -5,6 +5,7 @@ import { CartPage } from '../pages/cart/CartPage';
 import { ProductModalPage } from '../pages/products/ProductModalPage';
 import { ProductsPage } from '../pages/products/ProductsPage';
 import { ProfilePage } from '../pages/profile/ProfilePage';
+import { SignInPage } from '../pages/signin/SignInPage';
 import { SignUpPage } from '../pages/signup/SignUpPage';
 import { authActions } from './store/authSlice';
 import { TOKEN_STORAGE_KEY } from './store/authSaga';
@@ -64,6 +65,7 @@ function App() {
             }
           />
           <Route path="/products" element={<ProductsPage />} />
+          <Route path="/signin" element={<SignInPage />} />
           <Route path="/signup" element={<SignUpPage />} />
           <Route
             path="/products/new"
