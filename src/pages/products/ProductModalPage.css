@@ -1,0 +1,22 @@
+.product-modal-form {
+  width: min(100%, 520px);
+  display: grid;
+  gap: 14px;
+}
+
+.product-modal-form h2 {
+  margin: 0;
+  color: #111827;
+}
+
+.product-modal-form__actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.product-modal-form__error {
+  margin: 0;
+  color: #dc2626;
+  font-weight: 600;
+}
