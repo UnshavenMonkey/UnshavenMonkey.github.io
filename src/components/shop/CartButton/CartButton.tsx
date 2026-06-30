@@ -3,26 +3,21 @@ import './CartButton.css';
 
 interface CartButtonProps {
   count: number;
+  onAdd?: () => void;
 }
 
-export const CartButton: FC<CartButtonProps> = ({ count }) => {
+export const CartButton: FC<CartButtonProps> = ({ count, onAdd = () => undefined }) => {
   if (count === 0) {
     return (
-      <button className="cart-button" type="button">
+      <button className="cart-button" type="button" onClick={onAdd}>
         В корзину
       </button>
     );
   }
 
   return (
-    <div className="cart-button-counter">
-      <button className="cart-button-counter__btn" type="button">
-        −
-      </button>
-      <span className="cart-button-counter__count">{count}</span>
-      <button className="cart-button-counter__btn" type="button">
-        +
-      </button>
-    </div>
+    <button className="cart-button" type="button" onClick={onAdd}>
+      В корзине: {count}
+    </button>
   );
 };
